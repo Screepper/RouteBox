@@ -1,0 +1,33 @@
+# Web Server Configuration
+server:
+  port: 12100 # core-framework port
+
+# Logging Configuration
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+
+  file:
+    name: /data/routebox/logs/run.log # core-framework log file path
+
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      file-name-pattern: /data/routebox/logs/%d{yyyy-MM-dd}/run.%d{yyyy-MM-dd}.%i.log.gz # core-framework log compress file path
+      clean-history-on-start: false
+      total-size-cap: 2GB
+
+# Health Check Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+# Runtime Configuration
+spring:
+  profiles:
+    active: dev
+    default: dev

@@ -1,0 +1,67 @@
+:root {
+  /* Primary Colors */
+  --primary-color: #4454e4;
+  // --secondary-color: #7c85de;
+  --secondary-color: #a7abe6;
+
+  /* Background Colors */
+  --base-bg-color: #ddd;
+  --bg-color: #fff;
+  --sidebar-bg-color: #fff;
+  --card-bg-color: #f8f8f8;
+  --hover-bg-color: #e1e9f0;
+  --button-bg-color: #fff;
+
+  /* Text Colors */
+  --text-primary-color: #1e293b;
+  --text-secondary-color: #475569;
+  --text-reverse-color: #f1f5f9;
+
+  /* Border & Shadow */
+  --border-color: #ccc;
+  --box-shadow: 0 2px 6px 0px rgba(0, 0, 0, 0.15);
+  --box-shadow-tiny: 0 2px 2px 0px rgba(0, 0, 0, 0.15);
+
+  /* UI Components */
+  --switch-bg-color: #cbd5e1;
+  --switch-button-color: #fff;
+
+  /* Scrollbar */
+  --scrollbar-track-color: #f1f5f9;
+  --scrollbar-thumb-color: #cbd5e1;
+  --scrollbar-thumb-hover-color: #94a3b8;
+}
+
+/* Dark Theme */
+html.dark {
+  /* Primary Colors */
+  --primary-color: #a7abe6;
+  --secondary-color: #4454e4;
+
+  /* Background Colors */
+  --base-bg-color: #0f172a; /* Dark slate background */
+  --bg-color: #1e293b;
+  --sidebar-bg-color: #252d3b;
+  --card-bg-color: #1a2434;
+  --hover-bg-color: #38475c;
+  --button-bg-color: #334155;
+
+  /* Text Colors */
+  --text-primary-color: #f1f5f9;
+  --text-secondary-color: #cbd5e1;
+  --text-reverse-color: #1e293b;
+
+  /* Border & Shadow */
+  --border-color: #795717;
+  --box-shadow: 0 2px 6px 0px rgba(255, 255, 255, 0.15);
+  --box-shadow-tiny: 0 2px 2px 0px rgba(255, 255, 255, 0.15);
+
+  /* UI Components */
+  --switch-bg-color: #475569;
+  --switch-button-color: #111;
+
+  /* Scrollbar */
+  --scrollbar-track-color: #1e293b;
+  --scrollbar-thumb-color: #475569;
+  --scrollbar-thumb-hover-color: #64748b;
+}

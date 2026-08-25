@@ -1,0 +1,10 @@
+ROUTEBOX_BASE_URL = "http://routebox-core-framework:12100"
+WS_PORT = 4400
+
+BASE_INTERVAL = 60  # 1 minute
+MAX_REPAIR_ATTEMPTS = 3
+MAX_REPAIR_DURATION = 1200  # 20 minutes
+WAIT_DURATION = 900  # 15 minutes
+INTERRUPT_TIMEOUT = 60  # 1 minute
+
+LOGGER_DIR = "logs"

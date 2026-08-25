@@ -1,0 +1,82 @@
+apiVersion: 1
+
+datasources:
+  - name: system-network
+    type: elasticsearch
+    uid: SYSTEM_NETWORK
+    access: proxy
+    url: http://routebox-elasticsearch:12102
+    user: elastic
+    isDefault: true
+    basicAuth: true
+    basicAuthUser: "elastic"
+    jsonData:
+      includeFrozen: false
+      index: "system_network_log"
+      maxConcurrentShardRequests: 5
+      oauthPassThru: false
+      sigV4Auth: false
+      timeField: "timestamp"
+    secureJsonData:
+      basicAuthPassword: "routebox"
+    editable: true
+
+  # ping
+  - name: ping
+    type: elasticsearch
+    uid: PING
+    access: proxy
+    url: http://routebox-elasticsearch:12102
+    isDefault: false
+    basicAuth: true
+    basicAuthUser: "elastic"
+    jsonData:
+      includeFrozen: false
+      index: "ping_log"
+      maxConcurrentShardRequests: 5
+      oauthPassThru: false
+      sigV4Auth: false
+      timeField: "timestamp"
+    secureJsonData:
+      basicAuthPassword: "routebox"
+    editable: true
+
+  # topology
+  - name: topology
+    type: elasticsearch
+    uid: TOPOLOGY
+    access: proxy
+    url: http://routebox-elasticsearch:12102
+    isDefault: false
+    basicAuth: true
+    basicAuthUser: "elastic"
+    jsonData:
+      includeFrozen: false
+      index: "topology_log"
+      maxConcurrentShardRequests: 5
+      oauthPassThru: false
+      sigV4Auth: false
+      timeField: "timestamp"
+    secureJsonData:
+      basicAuthPassword: "routebox"
+    editable: true
+
+  # attack
+  - name: attack
+    type: elasticsearch
+    uid: ATTACK
+    access: proxy
+    url: http://routebox-elasticsearch:12102
+    isDefault: false
+    basicAuth: true
+    basicAuthUser: "elastic"
+    jsonData:
+      includeFrozen: false
+      index: "attack_log"
+      maxConcurrentShardRequests: 5
+      oauthPassThru: false
+      sigV4Auth: false
+      timeField: "timestamp"
+    secureJsonData:
+      basicAuthPassword: "routebox"
+    editable: true

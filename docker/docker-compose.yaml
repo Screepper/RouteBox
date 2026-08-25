@@ -1,0 +1,182 @@
+# data persistence volumes
+volumes:
+  data_es:
+  data_grafana:
+  data_routebox:
+
+# Ensure timezone is set to Asia/Shanghai (the nodes within SERNES follow this time zone)
+x-common: &common-config
+  environment:
+    - TZ=Asia/Shanghai
+
+services:
+  # 1. Elasticsearch
+  routebox-elasticsearch:
+    <<: *common-config # inherit common config
+    image: elasticsearch:9.0.3
+    container_name: routebox-elasticsearch
+    environment:
+      - "discovery.type=single-node" # single-node mode
+      - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m" # memory limit
+      - "ELASTIC_PASSWORD=routebox" # password
+      - "xpack.security.enabled=true" # enable security authentication
+      - "http.port=12102" # port
+    ports:
+      - "12102:12102" # port mapping (host:container)
+    volumes:
+      - data_es:/usr/share/elasticsearch/data # data persistence
+      - ./elasticsearch/es_indices.sh:/app/es_indices.sh # mount index script
+    healthcheck: # health check
+      test:
+        [
+          "CMD",
+          "curl",
+          "-u",
+          "elastic:routebox",
+          "-f",
+          "http://localhost:12102/_cluster/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    command: > # initialize ES indices after service startup
+      /bin/bash -c '
+      (
+        until curl -u elastic:routebox -f "http://localhost:12102/_cluster/health" > /dev/null 2>&1; do
+          sleep 5
+        done
+
+        bash /app/es_indices.sh
+      ) &
+
+      /usr/local/bin/docker-entrypoint.sh elasticsearch'
+    networks:
+      - routebox_network
+
+  # 2. Grafana
+  routebox-grafana:
+    <<: *common-config
+    image: grafana/grafana:12.0.2
+    container_name: routebox-grafana
+    environment:
+      - "GF_SECURITY_ADMIN_USER=admin" # username
+      - "GF_SECURITY_ADMIN_PASSWORD=routebox" # password
+      - "GF_USERS_ALLOW_SIGN_UP=false" # disable sign up
+      - "GF_SERVER_HTTP_PORT=12103" # port
+      - "GF_AUTH_ANONYMOUS_ENABLED=true"
+      - "GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer" # Viewer / Editor/ Admin
+    ports:
+      - "12103:12103"
+    volumes:
+      - data_grafana:/var/lib/grafana
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    healthcheck: # health check
+      test: ["CMD", "curl", "-f", "http://localhost:12103/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      routebox-elasticsearch:
+        condition: service_healthy
+    networks:
+      - routebox_network
+
+  # 3. Anomaly-detection
+  routebox-anomaly-detection:
+    <<: *common-config
+    build: ./anomaly-detection
+    image: routebox/anomaly-detection:latest
+    container_name: routebox-anomaly-detection
+    ports:
+      - "12101:12101"
+    volumes:
+      - ./anomaly-detection/config.py:/app/config.py # mount config file
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:12101/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - routebox_network
+
+  # 4. Core-framework
+  routebox-core-framework:
+    <<: *common-config
+    build: ./core-framework
+    image: routebox/core-framework:latest
+    container_name: routebox-core-framework
+    ports:
+      - "12100:12100"
+    volumes:
+      - ./core-framework/application-dev.yaml:/app/application-dev.yaml
+      - data_routebox:/data/routebox/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:12100/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    depends_on:
+      routebox-anomaly-detection:
+        condition: service_healthy
+      routebox-elasticsearch:
+        condition: service_healthy
+    networks:
+      - routebox_network
+
+  # 5. Visualization
+  routebox-visualization:
+    <<: *common-config
+    build: ./visualization
+    image: routebox/visualization:latest
+    container_name: routebox-visualization
+    ports:
+      - "80:80"
+    depends_on:
+      routebox-core-framework:
+        condition: service_healthy
+    networks:
+      - routebox_network
+
+  # 6. Attacker-agent
+  routebox-attacker-agent:
+    <<: *common-config
+    build: ./attacker-agent
+    image: routebox/attacker-agent:latest
+    container_name: routebox-attacker-agent
+    ports:
+      - "4399:4399"
+    volumes:
+      - ./attacker-agent/config.py:/app/config.py
+      - ./attacker-agent/storage:/app/storage
+      - ./attacker-agent/logs:/app/logs
+    depends_on:
+      routebox-core-framework:
+        condition: service_healthy
+    networks:
+      - routebox_network
+
+  # 7. Operator-agent
+  routebox-operator-agent:
+    <<: *common-config
+    build: ./operator-agent
+    image: routebox/operator-agent:latest
+    container_name: routebox-operator-agent
+    ports:
+      - "4400:4400"
+    volumes:
+      - ./operator-agent/config.py:/app/config.py
+      - ./operator-agent/storage:/app/storage
+      - ./operator-agent/logs:/app/logs
+    depends_on:
+      routebox-core-framework:
+        condition: service_healthy
+    networks:
+      - routebox_network
+
+# Unified network for all services
+networks:
+  routebox_network:
+    driver: bridge

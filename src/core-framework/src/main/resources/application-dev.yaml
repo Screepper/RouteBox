@@ -1,0 +1,33 @@
+elasticsearch: # Elasticsearch configuration
+  ip: routebox-elasticsearch # localhost
+  port: 12102
+  username: elastic
+  password: routebox
+
+grafana: # Grafana configuration
+  ip: routebox-grafana # localhost
+  port: 12103
+  username: admin
+  password: routebox
+
+scheduler:
+  logs-pull-cron: "0/20 * * * * *" # Topology logs pull interval ("-" if disabled)
+  # logs-pull-cron: "-" # disabled
+  real-time-detect-cron: "0 */1 * * * *" # Real-time anomaly detection interval ("-" if disabled)
+  # real-time-detect-cron: "-" # disabled
+
+topology:
+  sernes-id: xxx # SERNES ID (https://<Your SERNES ID>.frontend.sernes.cn/realsAdmin/#/reals/network)
+  ws: # SERNES WebSocket configuration
+    timeout-s: 20 # single connection timeout
+    max-retries: 5 # single connection max retry times
+    retry-wait-ms: 200 # single connection retry interval
+    max-connections: 18 # max concurrent connection count (not to high!)
+
+anomaly-detect:
+  url: http://routebox-anomaly-detection:12101 # http://localhost:12101 Anomaly detection API URL
+  detect-window: 1800 # Detection window size (seconds) (default: 30min)
+  combine-seconds: 30 # Combine seconds for detection (seconds) (default: 30s)
+  period-interval: 604800 # Period interval for detection (seconds) (default: 7 days)
+
+base-file-path: /data/routebox/ # Base file path for storing files
